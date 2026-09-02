@@ -9,7 +9,9 @@ const { OAuth2Client } = require('google-auth-library');
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
 const app = express();
-app.use(cors());
+app.use(cors({
+    origin: 'https://pixelme-mu.vercel.app' // ใส่โดเมนหน้าเว็บจริงของคุณ
+}));
 
 // ==========================================
 // 📧 ตั้งค่า Email (Nodemailer)
@@ -419,8 +421,8 @@ app.post('/api/payment/create-checkout', authenticateToken, async (req, res) => 
             }],
             mode: 'subscription', 
             // 🟢 เพิ่ม &session_id={CHECKOUT_SESSION_ID} เพื่อให้หน้าเว็บรู้รหัสการสั่งซื้อ
-            success_url: 'http://localhost:5500/pixelme/index.html?payment=success&tier=' + tier + '&session_id={CHECKOUT_SESSION_ID}',
-            cancel_url: 'http://localhost:5500/pixelme/index.html',
+            success_url: 'https://pixelme-mu.vercel.app/index.html?payment=success&tier=' + tier + '&session_id={CHECKOUT_SESSION_ID}',
+            cancel_url: 'https://pixelme-mu.vercel.app/index.html',
             metadata: {
                 userId: req.user.id,
                 tier: tier
@@ -447,7 +449,7 @@ app.post('/api/payment/create-portal', authenticateToken, async (req, res) => {
         // สร้างลิงก์ Portal ของลูกค้าคนนี้
         const session = await stripe.billingPortal.sessions.create({
             customer: user.stripeCustomerId,
-            return_url: 'http://localhost:5500/pixelme/index.html', // 🟢 กลับมาหน้าเว็บเราหลังจัดการเสร็จ
+            return_url: 'http://www.pixelme-app.com/index.html', // 🟢 กลับมาหน้าเว็บเราหลังจัดการเสร็จ
         });
 
         res.json({ portalUrl: session.url });
